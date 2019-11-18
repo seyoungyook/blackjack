@@ -62,20 +62,32 @@ int getIntegerInput(void) {
 //calculate the actual card number in the blackjack game
 int getCardNum(int cardnum) {
 	
-	int hart = 0;
-	int dia = 1;
-	int spade = 2;
-	int club = 3;
-	int A = 1;
-	int J = 11;
-	int Q = 12;
-	int K = 0;
+	int shape;
+	int num;
+	int cardnum;
+	
+	char *Shape[4] = { "Hart", "Dia", "Spade", "Club" };  //for print shape name
+	char *KAJQ[13] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" }; //for print letter K,A,J,Q
 	
 	int CardNum[4][13] = {
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}};
+	
+	printf("input the number of card shape ( hart=0, dia=1, spade=2, club=3 ) : ");
+	scanf("%d",&shape);
+	printf("input card number (K=0,A=1,J=11,Q=12) : ");
+	scanf("%d",&num);
+	
+	if(num>=2 && num <= 10)
+		printf("the actual card number of %s%d = %d", Shape[shape],num,num );
+	else if(num==0||num==11||num==12)
+		printf("the actual card number of %s%s = %d", Shape[shape], KAJQ[num], CardNum[shape][num] );
+	else if(num==1)
+		printf("the actual card number of %sA = 1 or 11", Shape[shape]);
+		
+
 		
 	return 0;
 }
@@ -85,6 +97,10 @@ void printCard(int shape, int num) {
 	
 	int shape;
 	int num;
+	int cardnum;
+	
+	char *Shape[4] = { "hart", "dia", "spade", "club" };
+	char *KAJQ[13] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" };
 	
 	int CardNum[4][13] = {
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
@@ -92,16 +108,18 @@ void printCard(int shape, int num) {
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}};
 	
-	printf("input card shape (hart=0,dia=1,spade=2,club=3) : ");
+	printf("input the number of card shape ( hart=0, dia=1, spade=2, club=3 ) : ");
 	scanf("%d",&shape);
-	
 	printf("input card number (K=0,A=1,J=11,Q=12) : ");
 	scanf("%d",&num);
 	
-	if( num!=1 )
-		printf("CardNum[%d][%d] = %d", shape,num,CardNum[shape][num]);
-	else
-		printf("CardNum[%d][1] = 1 or 11", shape);	
+	if(num>=2 && num <= 10)
+		printf("the card information is %s%d", Shape[shape],num );
+	else if(num==0||num==11||num==12)
+		printf("the card information is %s%s", Shape[shape], KAJQ[num]);
+	else if(num==1)
+		printf("the card information is %sA", Shape[shape]);
+		
 
 	return 0;
 	
@@ -177,9 +195,14 @@ int configUser(void) {
 	printf("Input the number of players (MAX:5) : ");
 	scanf("%d",&n_user);
 	
-	if(n_user > N_MAX_USER)
-		printf("Too many players!");
+	while(n_user > N_MAX_USER)
+	{
+		printf("Too many players!\n");
+		printf("Input the number of players (MAX:5) : ");
+		scanf("%d",&n_user);
 		
+	}
+	
 	return 0;
 	
 }
@@ -188,6 +211,20 @@ int configUser(void) {
 //betting
 int betDollar(void) {
 	
+	int yourbetting;
+	
+	printf("-------BETTING STEP--------\n");
+	printf(" -> your betting ( total :$%d) : ", N_DOLLAR );
+	scanf("%d",&yourbetting);
+	
+	while(yourbetting>N_DOLLAR)
+	{
+		printf(" -> you only have $%d! bet again\n", N_DOLLAR);
+		printf(" -> your betting ( total :$%d ) : ", N_DOLLAR );
+		scanf("%d",&yourbetting);
+	}
+	
+	return 0;
 }
 
 
