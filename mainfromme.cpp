@@ -15,15 +15,6 @@
 
 #define N_MIN_ENDCARD		30
 
-#define hart				0
-#define dia					1
-#define spade				2
-#define club				3
-#define A					1
-#define J					11
-#define Q					12
-#define K					0
-
 //card tray object
 int CardTray[N_CARDSET*N_CARD];
 int cardIndex = 0;							
@@ -41,6 +32,17 @@ int bet[N_MAX_USER];						//current betting
 int gameEnd = 0; 							//game end flag
 
 //some utility functions
+int cnt = 0; //in offering card
+char *Shape[4] = { "Hart", "Dia", "Spade", "Club" };  //for print shape name
+char *KAJQ[13] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" }; //for print letter K,A,J,Q
+int CardNum[4][13] = {
+{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
+{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
+{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
+{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}}; //save card's number
+int shape[N_CARDSET*N_CARD]; //save card's shape order in CardTray
+int num[N_CARDSET*N_CARD]; //save card's number order in CardTray
+
 
 //get an integer input from standard input (keyboard)
 //return : input integer value
@@ -60,68 +62,24 @@ int getIntegerInput(void) {
 //card processing functions ---------------
 
 //calculate the actual card number in the blackjack game
-int getCardNum(int cardnum) {
+//int cardnum mean cardhold[n][m]
+int getCardNum( int cardnum ) {
 	
-	int shape;
-	int num;
-	int cardnum;
+	return CardNum[shape[cardnum]][num[cardnum]];
 	
-	char *Shape[4] = { "Hart", "Dia", "Spade", "Club" };  //for print shape name
-	char *KAJQ[13] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" }; //for print letter K,A,J,Q
-	
-	int CardNum[4][13] = {
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}};
-	
-	printf("input the number of card shape ( hart=0, dia=1, spade=2, club=3 ) : ");
-	scanf("%d",&shape);
-	printf("input card number (K=0,A=1,J=11,Q=12) : ");
-	scanf("%d",&num);
-	
-	if(num>=2 && num <= 10)
-		printf("the actual card number of %s%d = %d", Shape[shape],num,num );
-	else if(num==0||num==11||num==12)
-		printf("the actual card number of %s%s = %d", Shape[shape], KAJQ[num], CardNum[shape][num] );
-	else if(num==1)
-		printf("the actual card number of %sA = 1 or 11", Shape[shape]);
-		
-
-		
-	return 0;
 }
 
 //print the card information (e.g. DiaA)
-void printCard(int shape, int num) {
-	
-	int shape;
-	int num;
-	int cardnum;
-	
-	char *Shape[4] = { "hart", "dia", "spade", "club" };
-	char *KAJQ[13] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" };
-	
-	int CardNum[4][13] = {
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}};
-	
-	printf("input the number of card shape ( hart=0, dia=1, spade=2, club=3 ) : ");
-	scanf("%d",&shape);
-	printf("input card number (K=0,A=1,J=11,Q=12) : ");
-	scanf("%d",&num);
-	
-	if(num>=2 && num <= 10)
-		printf("the card information is %s%d", Shape[shape],num );
-	else if(num==0||num==11||num==12)
-		printf("the card information is %s%s", Shape[shape], KAJQ[num]);
-	else if(num==1)
-		printf("the card information is %sA", Shape[shape]);
-		
+//int cardnum mean cardhold[n][m]
+void printCard( int cardnum ) {
 
-	return 0;
+	if(num[cardnum]>=2 && num[cardnum] <= 10)
+		printf(" %s%d ", Shape[shape[cardnum]],num[cardnum] );
+	else if(num[cardnum]==0||num[cardnum]==1||num[cardnum]==11||num[cardnum]==12)
+		printf(" %s%s ", Shape[shape[cardnum]], KAJQ[num[cardnum]]);
+
+
+	return;
 	
 	
 }
@@ -136,18 +94,12 @@ int mixCardTray(void) {
 	
 	int i,j;
 	
-	int CardNum[4][13] = {
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}};
 	
-	for(i=0;i<52;i++)
+	for(i=0;i<N_CARDSET*N_CARD;i++)
 	{
-		int shape[52];
-		int num[52];
 		shape[i] = rand()%4;
 		num[i] = rand()%13;
+		CardTray[i]=CardNum[shape[i]][num[i]];
 		
 		for(j=0;j<i;j++)
 		{
@@ -157,31 +109,18 @@ int mixCardTray(void) {
 				break;
 		}
 		
-		printf("CardNum[%d][%d] \n",shape[i],num[i]);	
 	}	
-	
+		
 	return 0;
 
 }
 
 //get one card from the tray
 int pullCard(void) {
-	
-	srand(time(NULL));
+		
+		
 
-	int CardNum[4][13] = {
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}};
 	
-	int shape;
-	int num;
-	
-	shape = rand()%4;
-	num = rand()%13;
-	
-	printf("CardNum[%d][%d]",shape,num);
 	
 	return 0;
 }
@@ -211,19 +150,32 @@ int configUser(void) {
 //betting
 int betDollar(void) {
 	
+	int i;
 	int yourbetting;
 	
+	srand(time(NULL));
+	
 	printf("-------BETTING STEP--------\n");
-	printf(" -> your betting ( total :$%d) : ", N_DOLLAR );
+	printf(" -> your betting ( total :$%d) : ", dollar[0] );
 	scanf("%d",&yourbetting);
 	
 	while(yourbetting>N_DOLLAR)
 	{
-		printf(" -> you only have $%d! bet again\n", N_DOLLAR);
-		printf(" -> your betting ( total :$%d ) : ", N_DOLLAR );
+		printf(" -> you only have $%d! bet again\n", dollar[0]);
+		printf(" -> your betting ( total :$%d ) : ", dollar[0] );
 		scanf("%d",&yourbetting);
 	}
 	
+	bet[0] = yourbetting;
+	
+	
+	for(i=1;i<n_user;i++)
+		{
+			bet[i] = rand()%5+1;
+			printf(" -> player %d bets $%d ( out of $%d )\n",i,bet[i],dollar[i]);
+		}
+
+		
 	return 0;
 }
 
@@ -231,15 +183,22 @@ int betDollar(void) {
 //offering initial 2 cards
 void offerCards(void) {
 	int i;
+	
 	//1. give two card for each players
 	for (i=0;i<n_user;i++)
 	{
-		cardhold[i][0] = pullCard();
-		cardhold[i][1] = pullCard();
+		cardhold[i][0] = cnt;
+		cnt++;
+		cardhold[i][1] = cnt;
+		cnt++;
+		cardSum[i] = getCardNum( cardhold[i][0] ) + getCardNum( cardhold[i][1] );
 	}
 	//2. give two card for the operator
-	cardhold[n_user][0] = pullCard();
-	cardhold[n_user][1] = pullCard();
+	cardhold[n_user][0] = cnt;
+	cnt++;
+	cardhold[n_user][1] = cnt;
+	cnt++;
+	cardSum[n_user] = getCardNum( cardhold[n_user][0] ) + getCardNum( cardhold[n_user][1] );
 	
 	return;
 }
@@ -247,10 +206,81 @@ void offerCards(void) {
 //print initial card status
 void printCardInitialStatus(void) {
 	
+	int i;
+	
+	printf("----------- CARD OFFERING -----------\n");
+	
+	//print server's card status
+	
+	printf("---server : X ");
+	printCard( cardhold[n_user][1] );
+	printf("\n");
+		
+	//print your card status
+		
+	printf("---you : ");
+	printCard( cardhold[0][0] );
+	printCard( cardhold[0][1] );
+	printf("\n");
+	
+	//print players's card status
+	
+	for(i=1;i<n_user;i++)
+		{ 
+			printf("---player %d : ",i);
+			printCard( cardhold[i][0] );
+			printCard( cardhold[i][1] );
+			printf("\n");
+	
+		}
+	
+	return;
+		
+	
 }
 
+//for me
 int getAction(void) {
 	
+	int G;
+	int i=2;
+	
+	while(cardSum[0]<21)
+	{
+		printf("Action? ( 0 : go, others : stay ) : ");
+		scanf("%d",&G);
+	
+		if(G=0)
+			{
+			cardhold[0][i]=CardTray[cnt];
+			cardSum[0] = cardSum[0]+cardhold[0][i];
+			cnt++;
+			i++;
+			printf("\n");
+			}
+		else
+			break;
+	}
+	
+}
+//for player
+int getActioninautomatic(int playernum){
+	
+	int i=2;
+	
+	while(cardSum[playernum]<17)
+		{
+			printf("GO!\n");
+			cardhold[playernum][i]=CardTray[cnt];
+			cardSum[playernum]=cardSum[playernum] + cardhold[playernum][i];
+			cnt++;
+			i++;
+		}
+		
+	if(cardSum[playernum]>=17)
+		printf("STAY!\n");
+		
+		
 }
 
 
@@ -294,6 +324,8 @@ int main(int argc, char *argv[]) {
 
 	//Game initialization --------
 	//1. players' dollar
+	for(i=0;i<N_MAX_USER;i++)
+		dollar[i] = 50;
 	
 	//2. card tray
 	mixCardTray();
