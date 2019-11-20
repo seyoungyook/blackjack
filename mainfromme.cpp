@@ -29,7 +29,7 @@ int n_user;									//number of users
 int cardhold[N_MAX_USER+1][N_MAX_CARDHOLD];	//cards that currently the players hold
 int cardSum[N_MAX_USER];					//sum of the cards
 int bet[N_MAX_USER];						//current betting 
-int gameEnd = 1; 							//game end flag
+int gameEnd = 0; 							//game end flag
 
 //some utility functions
 int cnt = 0; //in offering card
@@ -246,7 +246,7 @@ int getAction(void) {
 	int G;
 	int i=2;
 	
-	if(cardSum[0]=21)
+	if(cardSum[0]==21)
 		{
 			dollar[0] = dollar[0] + bet[0];
 			printf("BLACK JACK! --> +$%d ($%d)\n", bet[0], dollar[0]);
@@ -257,19 +257,19 @@ int getAction(void) {
 		printf("Action? ( 0 : go, others : stay ) : ");
 		scanf("%d",&G);
 	
-		if(G=0)
+		if(G==0)
 			{
 			cardhold[0][i]=CardTray[cnt];
 			cardSum[0] = cardSum[0]+ getCardNum(cardhold[0][i]);
+			printUserCardStatus(0,(i+1));
 			cnt++;
+			i++;
 			
 			if(cardSum[0]>=21)
 				break;
 			else
 				{
 				printf("\n");
-				printUserCardStatus(0,i);
-				i++;
 				}
 			}
 		else
@@ -278,7 +278,6 @@ int getAction(void) {
 	
 	if(cardSum[0]>21)
 		{
-			printUserCardStatus(0,i);
 			dollar[0] = dollar[0] - bet[0];
 			printf("DEAD (sum : %d) --> -$%d ($%d)\n", cardSum[0], bet[0], dollar[0]);
 		}
@@ -289,7 +288,7 @@ int getActioninautomatic(int playernum){
 	
 	int i=2;
 	
-	if(cardSum[playernum]=21&&playernum!=n_user)
+	if(cardSum[playernum]==21&&playernum!=n_user)
 		{
 			dollar[0] = dollar[0] + bet[0];
 			printf("BLACK JACK! --> +$%d ($%d)\n", bet[0], dollar[0]);
@@ -300,7 +299,7 @@ int getActioninautomatic(int playernum){
 			printf("GO!\n");
 			cardhold[playernum][i]=CardTray[cnt];
 			cardSum[playernum]=cardSum[playernum] + getCardNum(cardhold[playernum][i]);
-			printUserCardStatus(playernum,i);
+			printUserCardStatus(playernum,(i+1));
 			cnt++;
 			i++;
 		}
@@ -350,14 +349,21 @@ int calcStepResult(int cardSum, int playernum, int serversum) {
 			dollar[playernum] = dollar[playernum] + bet[playernum];
 			printf("Win (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
 			}
-		else if(cardSum<serversum&&cardSum<21)
+		else if(cardSum<serversum&&cardSum<21&&serversum<21)
 			{
 			dollar[playernum] = dollar[playernum] - bet[playernum];
 			printf("Lose (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
 			}
 		else if(cardSum>21)
 			printf("Lose due to overflow! ($%d)\n", dollar[playernum]);
-		}
+			
+		else if(serversum>21&&cardSum<=21)
+			{
+			dollar[playernum] = dollar[playernum] + bet[playernum];
+			printf("Win (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
+			}
+			
+	}
 	else if(getCardNum(cardhold[n_user][0])+getCardNum(cardhold[n_user][1])==21)
 		{
 		if(BJ == 21 )
@@ -376,11 +382,13 @@ int checkResult() {
 	
 	printf(" your result : ");
 	calcStepResult(cardSum[0],0,cardSum[n_user]);
+	printf("\n");
 	
 	for(i=1;i<n_user;i++)
 		{
 			printf(" %d'th player's result : ", i);
 			calcStepResult(cardSum[i],i,cardSum[n_user]);
+			printf("\n");
 		}
 	
 }
@@ -411,7 +419,7 @@ int checkWinner() {
 			}
 
 	if(win==(n_user-1))
-		printf("your win");
+		printf("your win\n");
 			
 	for(k=1;k<n_user;k++)
 		{
@@ -461,21 +469,21 @@ int main(int argc, char *argv[]) {
 		printCardInitialStatus();
 		printf("\n------------------ GAME start --------------------------\n");
 		//my turn
-		printf(">>> My turn! ------ ");
+		printf(">>> My turn! ------\n ");
 		printUserCardStatus(0, 2);
 		getAction();
 		
 		//each player's turn
 		for (j=1;j<n_user;j++) //each player
 		{	
-			printf(">>> Player %d turn! ------ ", j);
+			printf(">>> Player %d turn! ------\n ", j);
 			printUserCardStatus(j,2);
 			getActioninautomatic(j);
 		
 		}
 		
 		//sever's turn 
-		printf(">>> Server turn! ------ ");
+		printf(">>> Server turn! ------\n ");
 		printUserCardStatus(n_user,2);
 		getActioninautomatic(n_user);
 		BJ = getCardNum(cardhold[n_user][0])+getCardNum(cardhold[n_user][1]);
@@ -500,7 +508,7 @@ int main(int argc, char *argv[]) {
 		
 		if( ((N_CARDSET*N_CARD) - cardIndex ) < (n_user*2) )
 			{	printf("card ran out of the tray!! finishing the game\n");
-				gameEnd = 0;
+				gameEnd = 1;
 			}
 		
 		for(k=0;k<n_user;k++)
@@ -508,7 +516,7 @@ int main(int argc, char *argv[]) {
 				if ( dollar[k] <= 0 )
 					{
 					printf("someone go bankrupt!! finishing the game\n");
-					gameEnd = 0;
+					gameEnd = 1;
 					}
 			}
 		
