@@ -333,7 +333,7 @@ void printUserCardStatus(int user, int cardcnt) {
 
 // calculate the card sum and see if : 1. under 21, 2. over 21, 3. blackjack
 //cardSum<=21
-int calcStepResult(int cardSum, int playernum) {
+int calcStepResult(int cardSum, int playernum, int serversum) {
 	
 	int BJ;
 	int k;
@@ -345,12 +345,12 @@ int calcStepResult(int cardSum, int playernum) {
 		{
 		if(BJ == 21 )
 			printf("Win due to BlackJack! ($%d)\n", dollar[playernum]);
-		else if(cardSum>=cardSum[n_user]&&cardSum<=21&&BJ!=21)
+		else if(cardSum>=serversum&&cardSum<=21&&BJ!=21)
 			{
 			dollar[playernum] = dollar[playernum] + bet[playernum];
 			printf("Win (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
 			}
-		else if(cardSum<cardSum[n_user]&&cardSum<21)
+		else if(cardSum<serversum&&cardSum<21)
 			{
 			dollar[playernum] = dollar[playernum] - bet[playernum];
 			printf("Lose (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
@@ -375,12 +375,12 @@ int checkResult() {
 	int i;
 	
 	printf(" your result : ");
-	calcStepResult(cardSum[0],0);
+	calcStepResult(cardSum[0],0,cardSum[n_user]);
 	
 	for(i=1;i<n_user;i++)
 		{
 			printf(" %d'th player's result : ", i);
-			calcStepResult(cardSum[i],i);
+			calcStepResult(cardSum[i],i,cardSum[n_user]);
 		}
 	
 }
