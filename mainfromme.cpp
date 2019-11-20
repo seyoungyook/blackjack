@@ -431,7 +431,7 @@ int checkWinner() {
 				wwin++;
 			 }
 		 if(wwin == n_user)
-		 	printf("player %d's win",k);
+		 	printf("player %d's win\n",k);
 		}
 }
 
