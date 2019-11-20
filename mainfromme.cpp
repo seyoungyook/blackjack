@@ -336,6 +336,7 @@ void printUserCardStatus(int user, int cardcnt) {
 int calcStepResult(int cardSum, int playernum) {
 	
 	int BJ;
+	int k;
 	
 	BJ = getCardNum(cardhold[playernum][0])+getCardNum(cardhold[playernum][1]);
 	
@@ -386,6 +387,44 @@ int checkResult() {
 
 int checkWinner() {
 	
+	int i,j,k,l;
+	int win=0;
+	int wwin=0;
+	
+	printf("--------------------------------------------\n");
+	printf("--------------------------------------------\n");
+	printf("--------------------------------------------\n");
+	printf("game end!! your money : $%d, player's money : ' ", dollar[0]);
+	
+	for(i=1;i<n_user;i++)
+		{
+			printf(" %d,", dollar[i]);
+		}
+	printf("\n");
+	
+	for(j=1;j<n_user;j++)
+		{
+		if((dollar[0]-dollar[j])<0)
+			break;
+		else
+			win++;
+			}
+
+	if(win==(n_user-1))
+		printf("your win");
+			
+	for(k=1;k<n_user;k++)
+		{
+			for(l=0;l<n_user;l++)
+			 {
+			if((dollar[k]-dollar[l])<0)
+				break;
+			else 
+				wwin++;
+			 }
+		 if(wwin == n_user)
+		 	printf("player %d's win",k);
+		}
 }
 
 
@@ -460,9 +499,18 @@ int main(int argc, char *argv[]) {
 		printf("--------------------------------------------\n");
 		
 		if( ((N_CARDSET*N_CARD) - cardIndex ) < (n_user*2) )
-			gameEnd = 0;
+			{	printf("card ran out of the tray!! finishing the game\n");
+				gameEnd = 0;
+			}
 		
-		for(k=0;k<n_user;)
+		for(k=0;k<n_user;k++)
+			{
+				if ( dollar[k] <= 0 )
+					{
+					printf("someone go bankrupt!! finishing the game\n");
+					gameEnd = 0;
+					}
+			}
 		
 	} while (gameEnd == 0);
 	
