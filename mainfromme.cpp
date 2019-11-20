@@ -255,12 +255,26 @@ int getAction(void) {
 			cardhold[0][i]=CardTray[cnt];
 			cardSum[0] = cardSum[0]+cardhold[0][i];
 			cnt++;
-			i++;
-			printf("\n");
+			
+			if(cardSum[0]>=21)
+				break;
+			else
+				{
+				printf("\n");
+				printUserCardStatus(0,i);
+				i++;
+				}
 			}
 		else
 			break;
 	}
+	
+	if(cardSum[0]>21)
+		{
+			printUserCardStatus(0,i);
+			dollar[0] = dollar[0] - bet[0];
+			printf("DEAD (sum : %d) --> -$%d ($%d)", cardSum[0], bet[0], dollar[0]);
+		}
 	
 }
 //for player
@@ -273,13 +287,15 @@ int getActioninautomatic(int playernum){
 			printf("GO!\n");
 			cardhold[playernum][i]=CardTray[cnt];
 			cardSum[playernum]=cardSum[playernum] + cardhold[playernum][i];
+			printUserCardStatus(playernum,i);
 			cnt++;
 			i++;
 		}
 		
-	if(cardSum[playernum]>=17)
+	if(cardSum[playernum]>=17&&cardSum[playernum]<=21)
 		printf("STAY!\n");
-		
+	else if(cardsum[playernum]>21)
+		printf("DEAD (sum : %d) --> -$%d ($%d)", cardSum[playernum], bet[playernum], dollar[playernum]);
 		
 }
 
@@ -314,7 +330,7 @@ int checkWinner() {
 int main(int argc, char *argv[]) {
 	int roundIndex = 0;
 	int max_user;
-	int i;
+	int i, j;
 	
 	srand((unsigned)time(NULL));
 	
@@ -324,7 +340,7 @@ int main(int argc, char *argv[]) {
 
 	//Game initialization --------
 	//1. players' dollar
-	for(i=0;i<N_MAX_USER;i++)
+	for(i=0;i<n_user;i++)
 		dollar[i] = 50;
 	
 	//2. card tray
@@ -340,10 +356,16 @@ int main(int argc, char *argv[]) {
 		
 		printCardInitialStatus();
 		printf("\n------------------ GAME start --------------------------\n");
+		//my turn
+		printf(">>> My turn! ------ ");
+		printUserCardStatus(0, 2);
+		getAction();
 		
 		//each player's turn
-		for () //each player
-		{
+		for (j=1;j<n_user;j++) //each player
+		{	
+			printUserCardStatus(j,2);
+			getActioninautomatic(j);
 			while () //do until the player dies or player says stop
 			{
 				//print current card status printUserCardStatus();
