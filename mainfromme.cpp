@@ -32,14 +32,14 @@ int bet[N_MAX_USER];						//current betting
 int gameEnd = 0; 							//game end flag
 
 //some utility functions
-int cnt; //in offering card
+int cnt; //the (order -1) of the card in tray (ex, when cnt = 1, shape[1] means the shape of second card in the tray )
 char Shape[4][10] = { "Hart", "Dia", "Spade", "Club" };  //for print shape name
 char KAJQ[13][5] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" }; //for print letter K,A,J,Q
 int CardNum[4][13] = {
 { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
-{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}}; //save card's number
+{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10}}; //save the actual card number in the blackjack game
 int shape[N_CARDSET*N_CARD]; //save card's shape order in CardTray
 int num[N_CARDSET*N_CARD]; //save card's number order in CardTray
 
@@ -63,7 +63,7 @@ int getIntegerInput(void) {
 //card processing functions ---------------
 
 //calculate the actual card number in the blackjack game
-//int cardnum mean cardhold[n][m]
+//int cardnum mean cardhold[n][m]-order of the card in cardtray
 int getCardNum( int cardnum ) {
 	
 	return CardNum[shape[cardnum]][num[cardnum]];
@@ -74,9 +74,9 @@ int getCardNum( int cardnum ) {
 //int cardnum mean cardhold[n][m]
 void printCard( int cardnum ) {
 
-	if(num[cardnum]>=2 && num[cardnum] <= 10)
+	if(num[cardnum]>=2 && num[cardnum] <= 10) //when the card number is number
 		printf(" %s%d ", Shape[shape[cardnum]],num[cardnum] );
-	else if(num[cardnum]==0||num[cardnum]==1||num[cardnum]==11||num[cardnum]==12)
+	else if(num[cardnum]==0||num[cardnum]==1||num[cardnum]==11||num[cardnum]==12)//when the card number is leter
 		printf(" %s%s ", Shape[shape[cardnum]], KAJQ[num[cardnum]]);
 
 
@@ -98,8 +98,8 @@ int mixCardTray(void) {
 	
 	for(i=0;i<N_CARDSET*N_CARD;i++)
 	{
-		shape[i] = rand()%4;
-		num[i] = rand()%13;
+		shape[i] = rand()%4; //0=hart 1=dia 2=spade 3=club, save the order of card shape in cardtray
+		num[i] = rand()%13; //save the order of card number in cardtray
 		CardTray[i]=CardNum[shape[i]][num[i]];
 		
 		for(j=0;j<i;j++)
@@ -107,7 +107,7 @@ int mixCardTray(void) {
 			if( shape[i]==shape[j]&&num[i]==num[j] )
 				{
 					i=(i-1);
-					break;
+					break; //prevent overlap
 				}
 	
 		}
@@ -164,7 +164,7 @@ int betDollar(void) {
 	
 	for(i=1;i<n_user;i++)
 		{
-			bet[i] = rand()%5+1;
+			bet[i] = rand()%5+1; // player can bet $1~$5
 			printf(" -> player %d bets $%d ( out of $%d )\n",i,bet[i],dollar[i]);
 		}
 
@@ -181,7 +181,7 @@ void offerCards(void) {
 	//1. give two card for each players
 	for (i=0;i<n_user;i++)
 	{
-		cardhold[i][0] = cnt;
+		cardhold[i][0] = cnt; //cnt mean the order of card and actual value of cnt is (the order of card -1) and in cardhold, we save the order of card
 		cnt++;
 		cardhold[i][1] = cnt;
 		cnt++;
@@ -207,7 +207,7 @@ void printCardInitialStatus(void) {
 	//print server's card status
 	
 	printf("---server : X ");
-	printCard( cardhold[n_user][1] );
+	printCard( cardhold[n_user][1] ); //from the cardhold-order of card in tray- print card shape ans number
 	printf("\n");
 		
 	//print your card status
@@ -236,16 +236,16 @@ void printCardInitialStatus(void) {
 //for me
 int getAction(void) {
 	
-	int G;
+	int G; //mean go ( G + 0 -> look like G0 )
 	int i=2;
 	
-	if(cardSum[0]==21)
+	if(cardSum[0]==21) //in blackjack
 		{
 			dollar[0] = dollar[0] + bet[0];
 			printf("BLACK JACK! --> +$%d ($%d)\n", bet[0], dollar[0]);
 		}
 	
-	while(cardSum[0]<21)
+	while(cardSum[0]<21) //in under 21
 	{
 		printf("Action? ( 0 : go, others : stay ) : ");
 		scanf("%d",&G);
@@ -269,19 +269,19 @@ int getAction(void) {
 			break;
 	}
 	
-	if(cardSum[0]>21)
+	if(cardSum[0]>21) //when overflow
 		{
 			dollar[0] = dollar[0] - bet[0];
 			printf("DEAD (sum : %d) --> -$%d ($%d)\n", cardSum[0], bet[0], dollar[0]);
 		}
 	
 }
-//for player
+//for player and server
 int getActioninautomatic(int playernum){
 	
 	int i=2;
 	
-	if(cardSum[playernum]==21&&playernum!=n_user)
+	if(cardSum[playernum]==21&&playernum!=n_user) //when blackjack
 		{
 			dollar[0] = dollar[0] + bet[0];
 			printf("BLACK JACK! --> +$%d ($%d)\n", bet[0], dollar[0]);
@@ -299,12 +299,12 @@ int getActioninautomatic(int playernum){
 		
 	if(cardSum[playernum]>=17&&cardSum[playernum]<=21)
 		printf("STAY!\n");
-	else if(cardSum[playernum]>21&&playernum!=n_user)
+	else if(cardSum[playernum]>21&&playernum!=n_user) // when player overflow
 		{
 		dollar[playernum] = dollar[playernum] - bet[playernum];
 		printf("DEAD (sum : %d) --> -$%d ($%d)\n", cardSum[playernum], bet[playernum], dollar[playernum]);
 		}
-	else if(cardSum[n_user]>21)	
+	else if(cardSum[n_user]>21)	//when server overflow
 		{
 			printf("Server DEAD ( sum : %d )\n", cardSum[n_user]);
 		}
@@ -327,7 +327,7 @@ void printUserCardStatus(int user, int cardcnt) {
 //cardSum<=21
 int calcStepResult(int cardSum, int playernum, int serversum) {
 	
-	int BJ;
+	int BJ; //mean blackjack, actual value is sum of first and second cards
 	int k;
 	
 	BJ = getCardNum(cardhold[playernum][0])+getCardNum(cardhold[playernum][1]);
@@ -432,10 +432,10 @@ int checkWinner() {
 
 int main(int argc, char *argv[]) {
 	int roundIndex = 0;
-	int round = 1;
+	int round = 1; //for print round
 	int max_user;
-	int i, j, k;
-	int BJ;
+	int i, j, k; //used in for
+	int BJ; //mean blackjack, actual value is sum of first and second cards
 	
 	srand((unsigned)time(NULL));
 	
