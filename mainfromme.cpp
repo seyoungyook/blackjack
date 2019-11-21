@@ -32,9 +32,9 @@ int bet[N_MAX_USER];						//current betting
 int gameEnd = 0; 							//game end flag
 
 //some utility functions
-int cnt = 0; //in offering card
-char *Shape[4] = { "Hart", "Dia", "Spade", "Club" };  //for print shape name
-char *KAJQ[13] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" }; //for print letter K,A,J,Q
+int cnt; //in offering card
+char Shape[4][10] = { "Hart", "Dia", "Spade", "Club" };  //for print shape name
+char KAJQ[13][5] = { "K", "A", "x", "x", "x", "x", "x", "x", "x", "x", "x", "J", "Q" }; //for print letter K,A,J,Q
 int CardNum[4][13] = {
 { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
 { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10},
@@ -104,26 +104,18 @@ int mixCardTray(void) {
 		
 		for(j=0;j<i;j++)
 		{
-			if( shape[i]==shape[j] & num[i]==num[j] )
-				i--;
-			else
-				break;
+			if( shape[i]==shape[j]&&num[i]==num[j] )
+				{
+					i=(i-1);
+					break;
+				}
+	
 		}
 		
 	}	
 		
 	return 0;
 
-}
-
-//get one card from the tray
-int pullCard(void) {
-		
-		
-
-	
-	
-	return 0;
 }
 
 
@@ -184,6 +176,7 @@ int betDollar(void) {
 //offering initial 2 cards
 void offerCards(void) {
 	int i;
+	cnt = 0;
 	
 	//1. give two card for each players
 	for (i=0;i<n_user;i++)
@@ -259,7 +252,7 @@ int getAction(void) {
 	
 		if(G==0)
 			{
-			cardhold[0][i]=CardTray[cnt];
+			cardhold[0][i]=cnt;
 			cardSum[0] = cardSum[0]+ getCardNum(cardhold[0][i]);
 			printUserCardStatus(0,(i+1));
 			cnt++;
@@ -297,7 +290,7 @@ int getActioninautomatic(int playernum){
 	while(cardSum[playernum]<17)
 		{
 			printf("GO!\n");
-			cardhold[playernum][i]=CardTray[cnt];
+			cardhold[playernum][i]=cnt;
 			cardSum[playernum]=cardSum[playernum] + getCardNum(cardhold[playernum][i]);
 			printUserCardStatus(playernum,(i+1));
 			cnt++;
@@ -349,7 +342,7 @@ int calcStepResult(int cardSum, int playernum, int serversum) {
 			dollar[playernum] = dollar[playernum] + bet[playernum];
 			printf("Win (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
 			}
-		else if(cardSum<serversum&&cardSum<21&&serversum<21)
+		else if(cardSum<serversum&&cardSum<21&&serversum<=21)
 			{
 			dollar[playernum] = dollar[playernum] - bet[playernum];
 			printf("Lose (sum=%d) --> ($%d)\n", cardSum, dollar[playernum] );
@@ -500,7 +493,7 @@ int main(int argc, char *argv[]) {
 		checkResult();
 		
 		round++;
-		cardIndex = cnt + 1;
+		cardIndex = cnt;
 		
 		printf("--------------------------------------------\n");
 		printf("------------ROUND %d ( cardIndex : %d )\n",round,cardIndex);
